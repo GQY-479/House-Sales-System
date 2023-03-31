@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Registration</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("background-image.jpg");
+            background-size: cover;
+            background-position: center;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: grid;
+            grid-gap: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #message {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(0, 123, 255, 0.1);
+            border: 1px solid #007BFF;
+            border-radius: 3px;
+        }
+    </style>
+    <script>
+        function showRegistrationForm() {
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("registration-form").style.display = "grid";
+        }
+        function showLoginForm() {
+            document.getElementById("login-form").style.display = "grid";
+            document.getElementById("registration-form").style.display = "none";
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login form -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+            
+            <h2>Login</h2>
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" name="username" required>
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" name="password" required>
+            <label for="user-type">User Type:</label>
+            <select id="login-user-type" name="user-type" value="customer">
+                
+                <option value="customer">Customer</option>
+                <option value="propertyOwner">Property Owner</option>
+                <option value="agent">Agent</option>
+            </select>
+            <button type="submit">Login</button>
+            <button type="button" onclick="showRegistrationForm()">Register</button>
+        </form>
+
+        <!-- Registration form -->
+        <form id="registration-form" onsubmit="handleRegistration(event)" style="display:none;">
+            
+            <h2>Register</h2>
+            <label for="register-username">Username:</label>
+            <input type="text" id="register-username" name="username" required pattern="^[a-zA-Z0-9]{1,10}$">
+            <label for="register-email">Email:</label>
+            <!--             <input type="email" id="register-email" name="email" required> -->
+            <input type="email" id="register-email" placeholder="Email" required>
+
+            <label for="register-password">Password:</label>
+            <input type="password" id="register-password" name="password" required pattern="^[\S]{6,12}$">
+            <label for="register-confirm-password">Confirm Password:</label>
+            <input type="password" id="register-confirm-password" name="confirm_password" required>
+<!--             the right of option  -->
+            <select id="register-user-type" name="user-type">
+                
+                <option value="customer">Customer</option>
+                <option value="propertyOwner">Property Owner</option>
+                <option value="agent">Agent</option>
+            </select>
+            <button type="submit">Register</button>
+            <button type="button" onclick="showLoginForm()">Login</button>
+        </form>
+    </div>
+    <div id="message" style="display:none;"></div>
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById("login-username").value;
+            const password = document.getElementById("login-password").value;
+            const userType = document.getElementById("login-user-type").value;
+            try {
+                const formData = new URLSearchParams();
+                formData.append("username", username);
+                formData.append("password", password);
+                formData.append("userType", userType);
+                
+                const response = await fetch("http://127.0.0.1:3007/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: formData.toString()
+                });
+                const responseBody = await response.json();
+                if (responseBody.status === 0) {
+                    // Store the token in localStorage
+                    localStorage.setItem("token", responseBody.token);
+
+                    document.getElementById("message").innerHTML = responseBody.message;
+                    document.getElementById("message").style.display = "block";
+                } else {
+                    document.getElementById("message").innerHTML = responseBody.message;
+                    document.getElementById("message").style.display = "block";
+                }
+
+            } catch (error) {
+                console.error("An error occurred:", error);
+                alert("An error occurred. Please try again.");
+            }
+        }
+
+
+        async function handleRegistration(event) {
+            event.preventDefault();
+            const username = document.getElementById("register-username").value;
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+            const confirmPassword = document.getElementById("register-confirm-password").value;
+            const userType = document.getElementById("register-user-type").value;
+
+            const data = {
+                username: username,
+                email: email,
+                password: password,
+                userType: userType
+            };
+
+            // test
+            console.log('Data being sent:', data);
+            const response = await fetch("http://127.0.0.1:3007/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const responseBody = await response.json();
+            if (responseBody.status === 0) {
+                document.getElementById("message").innerHTML = "Registration successful!";
+                document.getElementById("message").style.display = "block";
+            } else {
+                document.getElementById("message").innerHTML = responseBody.message;
+                document.getElementById("message").style.display = "block";
+            }
+        }
+
+    </script>
+</body>
+
+</html>

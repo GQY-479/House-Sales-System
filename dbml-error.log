@@ -1,0 +1,27 @@
+2023-03-30T15:58:05.953Z
+SyntaxError: You have a syntax error at "tables.sql" line 12 column 3. Expected ")" or fields but "l" found.
+    at D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:55:13
+    at Array.forEach (<anonymous>)
+    at generate (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:48:14)
+    at importHandler (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\import.js:40:27)
+    at Object.sql2dbml (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\index.js:38:23)
+    at Object.<anonymous> (D:\nodejs\node_global\node_modules\@dbml\cli\bin\sql2dbml.js:4:19)
+    at Module._compile (node:internal/modules/cjs/loader:1254:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1308:10)
+    at Module.load (node:internal/modules/cjs/loader:1117:32)
+    at Module._load (node:internal/modules/cjs/loader:958:12)
+
+ROOT_ERROR:
+SyntaxError: Expected ")" or fields but "l" found.
+    at peg$buildStructuredError (D:\nodejs\node_global\node_modules\@dbml\cli\node_modules\@dbml\core\lib\parse\mysqlParser.js:1122:12)
+    at Object.peg$parse [as parse] (D:\nodejs\node_global\node_modules\@dbml\cli\node_modules\@dbml\core\lib\parse\mysqlParser.js:10369:11)
+    at Function.parseMySQLToJSON (D:\nodejs\node_global\node_modules\@dbml\cli\node_modules\@dbml\core\lib\parse\Parser.js:44:38)
+    at Function.parse (D:\nodejs\node_global\node_modules\@dbml\cli\node_modules\@dbml\core\lib\parse\Parser.js:73:32)
+    at Object._import [as import] (D:\nodejs\node_global\node_modules\@dbml\cli\node_modules\@dbml\core\lib\import\index.js:15:37)
+    at D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\import.js:40:68
+    at D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:52:23
+    at Array.forEach (<anonymous>)
+    at generate (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:48:14)
+    at importHandler (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\import.js:40:27)
+{"start":{"offset":291,"line":12,"column":3},"end":{"offset":292,"line":12,"column":4}}
+

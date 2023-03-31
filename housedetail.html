@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HouseDetail</title>
+    <script src="utils/fetchWithToken.js"></script>
+    
+</head>
+
+<body>
+    <div id="house-info"></div>
+    <div id='agent-info'></div>
+    
+    <script>
+        // Get the URL parameters
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        // Get the value of the 'id' parameter
+        const houseId = urlParams.get('id');
+        console.log(houseId)
+        // Use the 'houseId' value to get the house information
+        async function fetchHouseById(houseId) {
+            const response = await fetchWithToken(`http://127.0.0.1:3007/property/getHouse?houseId=${houseId}`);
+            const responseBody = await response.json();
+            console.log(responseBody.house)
+            return responseBody.house;
+        }
+
+        fetchHouseById(houseId).then((house) => {
+            const houseHtml = `
+                <h2>${house.title || 'hi'}</h2>
+                <div>
+                    ${house.images.map(image => `
+                        <img src="api_server${image.url}" alt="${image.description}">
+                    `).join('')}
+                </div>
+                <p>描述：${house.description}</p>
+                <p>位置：${house.location}</p>
+                <p>户型：${house.layout}</p>
+                <p>面积：${house.size}平米</p>
+                <p>单价：${house.unit_price}元/平米</p>
+                <p>总价：${house.total_price}元</p>
+                <p>开盘时间：${house.opening_date}</p>
+                <p>物业类型：${house.property_type}</p>
+                <p>房屋状态：${house.house_status}</p>
+                <p>装修情况：${house.decoration}</p>
+                <p>特色：${house.features || '无'}</p>
+
+            `;
+            document.getElementById('house-info').innerHTML = houseHtml;
+        });
+
+        // first: get agent id that manage the house
+        // second: get agent information by agent id
+        // third: display agent information
+        async function fetchAgentIdByHouseId(houseId) {
+            
+            try {
+                const response = await fetchWithToken(`http://127.0.0.1:3007/property/houseAgent?houseId=${houseId}`);
+                const responseBody = await response.json();
+                // console.log(responseBody)
+                // console.log(responseBody.agent)
+                return responseBody.agent.agent_id;
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
+        async function fetchAgentById(agentId) {
+            try {
+                const response = await fetchWithToken(`http://127.0.0.1:3007/my/agentinfo?id=${agentId}`);
+                const responseBody = await response.json();
+                console.log(responseBody)
+                console.log(responseBody.agentInfo)
+                return responseBody.agentInfo;
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
+        fetchAgentIdByHouseId(houseId).then((agentId) => {
+            
+            fetchAgentById(agentId).then((agent) => {
+                const agentHtml = `
+                    <h2>经纪人信息</h2>
+                    <div>
+                        <img src="api_server${agent.avatar}" alt="${agent.name}">
+                    </div>
+                    <p>姓名：${agent.name}</p>
+                    <p>电话：${agent.phone}</p>
+                    <p>邮箱：${agent.email}</p>
+                    <p>公司：${agent.company}</p>
+                    <p>职位：${agent.position}</p>
+                    <p>简介：${agent.introduction}</p>
+                `;
+                document.getElementById('agent-info').innerHTML = agentHtml;
+            });
+        });
+
+        fetchAgentIdByHouseId(houseId).then((agentId) => {
+            // console.log('agentId: '+agentId)
+            // second: get agent information by agent id
+            // third: display agent information
+        });
+
+
+    </script>
+</body>
+
+</html>

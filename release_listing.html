@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布房源</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="utils/fetchWithToken.js"></script>
+    <style>
+        .form-group input,
+        .form-group select {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center my-4">发布房源</h2>
+        <form id="propertyForm">
+
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+
+            <div class="form-group">
+                <label for="size">Size:</label>
+                <input type="number" class="form-control" id="size" name="size" step="0.01" required>
+                <small class="form-text text-muted">平方米</small>
+            </div>
+
+            <div class="form-group">
+                <label for="unit_price">Unit Price:</label>
+                <input type="number" class="form-control" id="unit_price" name="unit_price" step="0.01" required>
+                <small class="form-text text-muted">¥/平方米</small>
+            </div>
+
+            <div class="form-group">
+                <label for="total_price">Total Price:</label>
+                <input type="number" class="form-control" id="total_price" name="total_price" step="0.01" required>
+                <small class="form-text text-muted">¥</small>
+            </div>
+
+            <div class="form-group">
+                <label for="layout">Layout:</label>
+                <select class="form-control" id="layout" name="layout" required>
+                    <option value="1居">1居</option>
+                    <option value="2居">2居</option>
+                    <option value="3居">3居</option>
+                    <option value="4居">4居</option>
+                    <option value="5居">5居</option>
+                    <option value="5居+">5居+</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="opening_date">Opening Date:</label>
+                <select class="form-control" id="opening_date" name="opening_date" required>
+                    <option value="近期开盘">近期开盘</option>
+                    <option value="未来一个月">未来一个月</option>
+                    <option value="未来三个月">未来三个月</option>
+                    <option value="未来半年">未来半年</option>
+                    <option value="过去一个月">过去一个月</option>
+                    <option value="过去三个月">过去三个月</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="property_type">Property Type:</label>
+                <select class="form-control" id="property_type" name="property_type" required>
+                    <option value="住宅">住宅</option>
+                    <option value="别墅">别墅</option>
+                    <option value="商业">商业</option>
+                    <option value="写字">写字</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="house_status">House Status:</label>
+                <select class="form-control" id="house_status" name="house_status" required>
+                    <option value="在售">在售</option>
+                    <option value="未开盘">未开盘</option>
+                    <option value="售罄">售罄</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="decoration">Decoration:</label>
+                <select class="form-control" id="decoration" name="decoration" required>
+                    <option value="带装修">带装修</option>
+                    <option value="毛坯">毛坯</option>
+                    <option value="简装">简装</option>
+                    <option value="精装">精装</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="features">Features:</label>
+                <select class="form-control" id="features" name="features">
+                    <option value="地铁">地铁</option>
+                    <option value="学区">学区</option>
+                    <option value="商圈">商圈</option>
+                    <option value="公园">公园</option>
+                    <option value="医院">医院</option>
+                    <option value="景观">景观</option>
+                </select>
+            </div>
+            <div class="form-group">
+
+                <label for="description">Description of House:</label>
+                 <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+             </div>
+          <!-- // Add a file input for uploading images of the house -->
+            <div class="form-group">
+                <label for="house_images">Upload Images:</label>
+                <input type="file" class="form-control-file" id="house_images" name="house_images[]" multiple>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("propertyForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            try {
+                const response = await fetchWithToken("http://127.0.0.1:3007/property/create", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("房源发布失败，请重试");
+            }
+        });
+    </script>
+</body>
+
+</html>

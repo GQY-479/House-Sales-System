@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Real Estate Web Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            margin-right: 10px;
+            border-right: 1px solid #ccc;
+            padding-right: 10px;
+        }
+
+        .nav a:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .nav a:hover {
+            color: #007BFF;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+    <script>
+        function openLoginPopup() {
+            // Create a pop-up window for login and registration
+            window.open("login.html", "Login", "width=400,height=500");
+        }
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <h1>Real Estate</h1>
+        <nav class="nav">
+            <a href="houses.html" target="_blank">Second Hand House</a>
+            <a href="#" target="_blank">New House</a>
+            <a href="#" target="_blank">Renting</a>
+            <a href="release_listing.html" target="_blank">Release a Listing</a>
+            <button class="login-btn" onclick="openLoginPopup()">Login / Register</button>
+            <a href="users.html" target="_blank">User</a>
+            <a href="agent.html" target="_blank">agent</a>
+        </nav>
+        <div class="search-box">
+            <input type="text" placeholder="Search...">
+        </div>
+    </header>
+
+    
+</body>
+
+</html>

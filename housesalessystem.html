@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Retrieve House Information</title>
+<!-- Add a link to a CSS file to style the web page -->
+<!-- <link rel="stylesheet" href="styles.css"> -->
+ <style>
+/* Add CSS styles to make the page more beautiful */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+#searchForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px;
+}
+
+label, input, button {
+  margin: 10px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#resultsTable {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+#resultsTable th, #resultsTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#resultsTable th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#resultsTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#resultsTable tr:hover {
+  background-color: #ddd;
+}
+ </style>
+</head>
+<body>
+<!-- Create a form for customers to input search criteria -->
+ <form id="searchForm" onsubmit="event.preventDefault(); fetchHouseData();">
+  <label for="location">Location:</label>
+  <input type="text" id="location" name="location" placeholder="Enter location">
+
+  <label for="minPrice">Minimum Price:</label>
+  <input type="number" id="minPrice" name="minPrice" placeholder="Enter minimum price">
+
+  <label for="maxPrice">Maximum Price:</label>
+  <input type="number" id="maxPrice" name="maxPrice" placeholder="Enter maximum price">
+
+  <button type="submit">Search</button>
+</form>
+
+<!-- Display search results in a table -->
+<table id="resultsTable">
+  <thead>
+    <tr>
+      <th>Address</th>
+      <th>Price</th>
+      <th>Bedrooms</th>
+      <th>Bathrooms</th>
+      <th>Area</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Search results will be populated here -->
+  </tbody>
+</table>
+	<script>
+
+ async function fetchHouseData() {
+  const location = document.getElementById('location').value;
+  const minPrice = document.getElementById('minPrice').value;
+  const maxPrice = document.getElementById('maxPrice').value;
+
+  const response = await fetch(`http://localhost:3007/houses?location=${location}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
+  const houses = await response.json();
+
+  updateResultsTable(houses);
+}
+
+	function updateResultsTable(houses) {
+  const tableBody = document.querySelector('#resultsTable tbody');
+  tableBody.innerHTML = '';
+
+  houses.forEach(house => {
+    const row = document.createElement('tr');
+
+    const addressCell = document.createElement('td');
+    addressCell.textContent = house.address;
+    row.appendChild(addressCell);
+
+    const priceCell = document.createElement('td');
+    priceCell.textContent = house.price;
+    row.appendChild(priceCell);
+
+    const bedroomsCell = document.createElement('td');
+    bedroomsCell.textContent = house.bedrooms;
+    row.appendChild(bedroomsCell);
+
+    const bathroomsCell = document.createElement('td');
+    bathroomsCell.textContent = house.bathrooms;
+    row.appendChild(bathroomsCell);
+
+    const areaCell = document.createElement('td');
+    areaCell.textContent = house.area;
+    row.appendChild(areaCell);
+
+    tableBody.appendChild(row);
+  });
+}
+
+
+	</script>
+</body>
+</html>

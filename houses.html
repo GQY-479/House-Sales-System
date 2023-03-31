@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>houses</title>
+    <script src="utils/fetchWithToken.js"></script>
+    <script>
+
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        #houses-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+
+        .house {
+            
+            width: 100%;
+            
+            max-width: 800px;
+            height: 300px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .house:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .house h2 {
+            font-size: 24px;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            text-align: center;
+        }
+
+        .house p {
+            font-size: 16px;
+            margin: 10px 0;
+            padding: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #666;
+        }
+
+        .house-info {
+            grid-column: 2 / 3;
+            grid-row: 2 / 6;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, auto);
+            margin-top: 20px;
+            column-gap: 20px;
+            /* add gap between columns */
+        }
+
+        .house-info-item {
+/*             display: flex; */
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .house-info-item span:first-child {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .house-info-item span:last-child {
+            color: #666;
+        }
+
+        .house-picture {
+            grid-column: 1 / 2;
+            grid-row: 2 / 6;
+            width: 200px;
+            height: 200px;
+/*             display: flex; */
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .house-picture img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+        }
+
+        #filter-container {
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        #filter-container h3 {
+            margin: 0;
+            padding: 0;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: repeat(10, auto);
+            row-gap: 20px;
+        }
+
+        .form-group {
+            margin: 10px;
+            grid-column: 1 / 2;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input[type="text"],
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        button[type="submit"] {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #666;
+        }
+
+        .page-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .page-bar button {
+            margin: 0 10px;
+            padding: 5px 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .page-bar button:hover {
+            background-color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="filter-container">
+        <h3>Filter Houses</h3>
+        <form id="filter-form">
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location">
+            </div>
+            <div class="form-group">
+                <label for="size">Size:</label>
+                <input type="radio" id="size" name="size" value="0-50m²">0-50m²
+                <input type="radio" id="size" name="size" value="50-100m²">50-100m²
+                <input type="radio" id="size" name="size" value="100-150m²">100-150m²
+                <input type="radio" id="size" name="size" value="150-200m²">150-200m²
+                <input type="radio" id="size" name="size" value="200-250m²">200-250m²
+                <input type="radio" id="size" name="size" value="250-300m²">250-300m²
+                <input type="radio" id="size" name="size" value="300+m²">300+m²
+            </div>
+            <div class="form-group">
+                <label for="unit_price">Unit Price:</label>
+                <input type="radio" id="unit_price" name="unit_price" value="0-5000¥/m²">0-5000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="5000-10000¥/m²">5000-10000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="10000-15000¥/m²">10000-15000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="15000-20000¥/m²">15000-20000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="20000-25000¥/m²">20000-25000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="25000-30000¥/m²">25000-30000¥/m²
+                <input type="radio" id="unit_price" name="unit_price" value="30000+¥/m²">30000+¥/m²
+            </div>
+            <div class="form-group">
+                <label for="total_price">Total Price:</label>
+                <input type="radio" id="total_price" name="total_price" value="0-500000¥">0-500000¥
+                <input type="radio" id="total_price" name="total_price" value="500000-1000000¥">500000-1000000¥
+                <input type="radio" id="total_price" name="total_price" value="1000000-1500000¥">1000000-1500000¥
+                <input type="radio" id="total_price" name="total_price" value="1500000-2000000¥">1500000-2000000¥
+                <input type="radio" id="total_price" name="total_price" value="2000000-2500000¥">2000000-2500000¥
+                <input type="radio" id="total_price" name="total_price" value="2500000-3000000¥">2500000-3000000¥
+                <input type="radio" id="total_price" name="total_price" value="3000000+¥">3000000+¥
+            </div>
+            <div class="form-group">
+                <label for="layout">Layout:</label>
+                <input type="radio" id="layout" name="layout" value="1居">1居
+                <input type="radio" id="layout" name="layout" value="2居">2居
+                <input type="radio" id="layout" name="layout" value="3居">3居
+                <input type="radio" id="layout" name="layout" value="4居">4居
+                <input type="radio" id="layout" name="layout" value="5居">5居
+                <input type="radio" id="layout" name="layout" value="5居+">5居+
+            </div>
+            <div class="form-group">
+                <label for="opening_date">Opening Date:</label>
+                <input type="radio" id="opening_date" name="opening_date" value="近期开盘">近期开盘
+                <input type="radio" id="opening_date" name="opening_date" value="未来一个月">未来一个月
+                <input type="radio" id="opening_date" name="opening_date" value="未来三个月">未来三个月
+                <input type="radio" id="opening_date" name="opening_date" value="未来半年">未来半年
+                <input type="radio" id="opening_date" name="opening_date" value="过去一个月">过去一个月
+                <input type="radio" id="opening_date" name="opening_date" value="过去三个月">过去三个月
+            </div>
+            <div class="form-group">
+                <label for="property_type">Property Type:</label>
+                <input type="radio" id="property_type" name="property_type" value="公寓">公寓
+                <input type="radio" id="property_type" name="property_type" value="别墅">别墅
+                <input type="radio" id="property_type" name="property_type" value="商铺">商铺
+                <input type="radio" id="property_type" name="property_type" value="写字楼">写字楼
+                <input type="radio" id="property_type" name="property_type" value="其他">其他
+            </div>
+            <div class="form-group">
+                <label for="house_status">House Status:</label>
+                <input type="radio" id="house_status" name="house_status" value="在售">在售
+                <input type="radio" id="house_status" name="house_status" value="待售">待售
+                <input type="radio" id="house_status" name="house_status" value="售罄">售罄
+            </div>
+            <div class="form-group">
+                <label for="decoration">Decoration:</label>
+                <input type="radio" id="decoration" name="decoration" value="毛坯">毛坯
+                <input type="radio" id="decoration" name="decoration" value="简装">简装
+                <input type="radio" id="decoration" name="decoration" value="精装">精装
+                <input type="radio" id="decoration" name="decoration" value="豪装">豪装
+            </div>
+            <div class="form-group">
+                <label for="features">Features:</label>
+                <input type="checkbox" id="features" name="features" value="近地铁">近地铁
+                <input type="checkbox" id="features" name="features" value="学区房">学区房
+                <input type="checkbox" id="features" name="features" value="南北通透">南北通透
+                <input type="checkbox" id="features" name="features" value="复式">复式
+                <input type="checkbox" id="features" name="features" value="带花园">带花园
+            </div>
+
+
+            <div class="form-group">
+                <<button type="submit">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="houses-container"></div>
+    <div class="page-option-bar">
+        <button class="previous-page-button">Previous Page</button>
+        <button class="page-button">1</button>
+        <button class="next-page-button">Next Page</button>
+    </div>
+    <script>
+        // let houses = [];
+        const housesContainer = document.getElementById('houses-container');
+
+        function displayHouses(houses) {
+
+
+
+            // console.log(houses)
+            // console.log(houses[0])
+            // console.log(houses[0].images)
+            // console.log(houses[0].images[0])
+
+            houses.forEach(house => {
+                const houseDiv = document.createElement('div');
+                houseDiv.className = 'house';
+                house.title = house.title || "Hi";
+                houseDiv.innerHTML = `
+                    <h2>${house.title}</h2>
+                    <p>${house.description}</p>
+                    <span class="house-picture">
+                        ${house.images ? `<img src="api_server${house.images.url}" alt="${house.images.description}">` : ''}
+                    </span>
+                    <span class="house-info">
+                        
+                        <div class="house-info-item"><span>Location:</span><span>${house.location}</span></div>
+                        <div class="house-info-item"><span>Size:</span><span>${house.size} m²</span></div>
+                        <div class="house-info-item"><span>Unit Price:</span><span>${house.unit_price} ¥/m²</span></div>
+                        <div class="house-info-item"><span>Total Price:</span><span>${house.total_price} ¥</span></div>
+                        <div class="house-info-item"><span>Layout:</span><span>${house.layout}</span></div>
+                        <div class="house-info-item"><span>Opening Date:</span><span>${house.opening_date}</span></div>
+                        <div class="house-info-item"><span>Property Type:</span><span>${house.property_type}</span></div>
+                        <div class="house-info-item"><span>House Status:</span><span>${house.house_status}</span></div>
+                        <div class="house-info-item"><span>Decoration:</span><span>${house.decoration}</span></div>
+                        <div class="house-info-item"><span>Features:</span><span>${house.features}</span></div>
+                        
+                    </span>
+                    
+
+
+                `;
+                houseDiv.addEventListener('click', () => {
+                    window.location.href = `housedetail.html?id=${house.id}`;
+                });
+
+                housesContainer.appendChild(houseDiv);
+            });
+
+
+        }
+
+        // Fetch houses data from the server and display it on the page
+        async function fetchHouses() {
+
+            const response = await fetchWithToken('http://127.0.0.1:3007/property/list');
+            const responseBody = await response.json();
+            displayHouses(responseBody.houses);
+
+            const filterForm = document.getElementById('filter-form');
+
+            filterForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const formData = new FormData(filterForm);
+                console.log(formData.entries())
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, value)
+                }
+                const filteredHouses = responseBody.houses.filter(house => {
+                    let isMatched = true;
+                    for (let [key, value] of formData.entries()) {
+                        if (value && house[key] !== value) {
+                            if (key === 'size' || key === 'unit_price' || key === 'total_price') {
+                                const [min, max] = value.split('-').map(Number);
+                                if (house[key] < min || house[key] > max) {
+                                    isMatched = false;
+                                    break;
+                                }
+                            } else {
+                                isMatched = false;
+                                break;
+                            }
+                        }
+                    }
+                    return isMatched;
+                });
+                housesContainer.innerHTML = '';
+                displayHouses(filteredHouses);
+            });
+        }
+
+        // when I click next-page-button, I want to fetch the next page of houses and display them and add a page-button for the next page
+        let currentPage = 1;
+        let totalPages = 1;
+        const pageButtonContainer = document.querySelector('.page-option-bar');
+        const nextButton = document.querySelector('.next-page-button');
+        const previousButton = document.querySelector('.previous-page-button');
+
+        async function fetchNextPage() {
+
+            currentPage++;
+            const response = await fetchWithToken(`http://127.0.0.1:3007/property/list?page=${currentPage}`);
+            const responseBody = await response.json();
+            housesContainer.innerHTML = '';
+            displayHouses(responseBody.houses);
+            // one page should have only one page-button
+            if (currentPage > totalPages) {
+                addPageButton(currentPage);
+                totalPages++;
+            }
+
+        }
+
+        function addPageButton(pageNumber) {
+            const pageButton = document.createElement('button');
+            pageButton.className = 'page-button';
+            pageButton.textContent = pageNumber;
+            pageButtonContainer.insertBefore(pageButton, nextButton);
+            pageButton.addEventListener('click', () => {
+                currentPage = pageNumber;
+                fetchNextPage();
+            });
+        }
+
+        nextButton.addEventListener('click', fetchNextPage);
+
+        previousButton.addEventListener('click', async () => {
+            if (currentPage > 1) {
+                currentPage--;
+                const response = await fetchWithToken(`http://127.0.0.1:3007/property/list?page=${currentPage}`);
+                const responseBody = await response.json();
+                housesContainer.innerHTML = '';
+                displayHouses(responseBody.houses);
+            }
+        });
+
+        // page-button click event listener
+        pageButtonContainer.addEventListener('click', (event) => {
+            if (event.target.className === 'page-button') {
+                currentPage = Number(event.target.textContent);
+                // to use fetchNextPage() function, I need to change the value of currentPage
+                currentPage--;
+                fetchNextPage();
+            }
+        });
+
+
+
+
+        // Fetch houses data when the page loads
+        window.addEventListener('DOMContentLoaded', fetchHouses);
+    </script>
+</body>
+
+</html>

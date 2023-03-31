@@ -1,0 +1,13 @@
+2023-03-30T15:57:48.521Z
+Error: ENOENT: no such file or directory, stat 'D:\编程练习\网页设计\web-projects\房屋销售系统\api_server\tables.sql'
+    at Object.statSync (node:fs:1596:3)
+    at validateFilePlugin (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\validatePlugins\validatePlugins.js:13:28)
+    at D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:28:31
+    at Array.every (<anonymous>)
+    at validateInputFilePaths (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\utils.js:28:16)
+    at importHandler (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\import.js:33:39)
+    at Object.sql2dbml (D:\nodejs\node_global\node_modules\@dbml\cli\lib\cli\index.js:38:23)
+    at Object.<anonymous> (D:\nodejs\node_global\node_modules\@dbml\cli\bin\sql2dbml.js:4:19)
+    at Module._compile (node:internal/modules/cjs/loader:1254:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1308:10)
+

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #Navigation-Bar {
+      width: 100px;
+      /*  height: 100%; */
+    }
+
+    #content-container {
+      display: none;
+    }
+
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 200px;
+      /* Added this line to fix the size of the navigation bar */
+
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    /* Change the link color to #111 (black) on hover */
+    li a:hover {
+      background-color: #111;
+    }
+
+    /* Added CSS for better styling */
+    .content-container {
+      display: none;
+      padding: 20px;
+      background-color: #f1f1f1;
+
+    }
+
+    /* Added CSS for better styling */
+    .content-container h2 {
+      margin-top: 0;
+    }
+
+    /* Added CSS for better styling */
+    form {
+      display: inline-block;
+    }
+
+    /* Added CSS for better styling */
+    label {
+      display: inline-block;
+      width: 150px;
+      text-align: right;
+      margin-right: 10px;
+    }
+
+    /* Added CSS for better styling */
+    input[type="password"] {
+      width: 200px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* Added CSS for better styling */
+    button[type="button"] {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Added CSS for better styling */
+    button[type="button"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+
+  <script src="utils/fetchWithToken.js"></script>
+  <script>
+    async function getUserType() {
+      const response = await fetchWithToken("http://127.0.0.1:3007/my/usertype", {
+        method: "GET",
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
+      });
+      const data = await response.json();
+      // console.log(data);
+      const userType = data.userType;
+      // console.log('userType: '+userType);
+      return userType;
+    }
+
+    let userInfo
+    // let test = {a:1, b:2}
+
+    async function getUserInfo() {
+      const response = await fetchWithToken("http://127.0.0.1:3007/my/userinfo", {
+        method: "GET",
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
+      });
+      const data = await response.json();
+      console.log(data);
+      // const userInfo = data.userInfo;
+      userInfo = data.userInfo;
+      console.log('userInfo: ' + userInfo);
+      return userInfo;
+    };
+
+
+
+
+
+    // get userType when load the page
+    window.onload = async function () {
+      const userType = await getUserType();
+      // console.log('hi '+userType);
+      if (userType.includes("agent")) {
+        document.getElementById("houses-focused-customer").style.display = "none";
+        document.getElementById("houses-focused-agent").style.display = "block";
+          getAgentHouses()
+    getAgentDeals()
+    getAgentHouseViewings()
+      }
+      else if (userType.includes("customer")) {
+        document.getElementById("houses-focused-customer").style.display = "block";
+        document.getElementById("houses-focused-agent").style.display = "none";
+        getPropertyOwnerHouses()
+      }
+
+      else {
+        console.log("userType is not customer or agent");
+      }
+      const userInfo = await getUserInfo();
+      const userName = userInfo.username;
+      document.getElementById("user-name-customer").innerHTML = userName;
+      document.getElementById("username-customer").innerHTML = `Username: ${userInfo.username}`;
+      document.getElementById("name-customer").innerHTML = `name: ${userInfo.name}`;
+      document.getElementById("email-customer").innerHTML = `Email: ${userInfo.email}`;
+      document.getElementById("phone-customer").innerHTML = `Phone: ${userInfo.phone}`;
+    }
+
+
+    function showContent(id) {
+      const contentContainers = document.querySelectorAll(".content-container");
+      contentContainers.forEach((container) => (container.style.display = "none"));
+      document.getElementById(id).style.display = "block";
+    }
+
+    async function changePassword() {
+      const oldPassword = document.getElementById("old-password").value;
+      const newPassword = document.getElementById("new-password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+
+      if (newPassword === confirmPassword) {
+        try {
+          const response = await fetchWithToken("http://127.0.0.1:3007/my/updatepwd", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `oldPwd=${encodeURIComponent(oldPassword)}&newPwd=${encodeURIComponent(newPassword)}`,
+          });
+
+          const message = await response.text(); // Added this line to get the response message
+
+          if (response.ok) {
+            alert(`${message}`);
+          } else {
+            alert(`Error: Failed to change password: ${message}`);
+          }
+        } catch (error) {
+          alert(`Error: Network error occurred: ${error.message}`);
+        }
+      } else {
+        alert("Error: Invalid old password or new password does not match");
+      }
+    }
+    // generate a function to edit profile
+    async function editProfile() {
+
+      const name = document.getElementById("edit-name").value;
+      const email = document.getElementById("edit-email").value;
+      const phone = document.getElementById("edit-phone").value;
+      const data = {
+        name: name,
+        email: email,
+        phone: phone
+      };
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/my/update/profile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+
+        })
+        const message = await response.text(); // Added this line to get the response message
+        if (response.ok) {
+          alert(`${message}`);
+        } else {
+          alert(`Error: Failed to update profile: ${message}`);
+        }
+      }
+      catch (error) {
+        alert(`Error: when updating profile. Network error occurred: ${error.message}`);
+      }
+    }
+
+    // generate a function to create a new house viewing
+    async function createHouseViewing() {
+      const houseId = document.getElementById("house-id-view").value;
+      const customerId = document.getElementById("customer-id-view").value;
+      const agentId = document.getElementById("agent-id-view").value;
+      const scheduledAt = document.getElementById("scheduled-at-view").value;
+      const data = {
+        house_id: houseId,
+        customer_id: customerId,
+        agent_id: agentId,
+        scheduled_at: scheduledAt
+      };
+      console.log(data);
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/viewHouse", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+
+        })
+        const message = await response.text(); // Added this line to get the response message
+        if (response.ok) {
+          alert(`${message}`);
+        } else {
+          alert(`Error: Failed to create new house viewing: ${message}`);
+        }
+      }
+      catch (error) {
+        alert(`Error: when creating new house viewing. Network error occurred: ${error.message}`);
+      }
+    }
+
+    // generate a function to create a new deal
+    async function createDeal() {
+
+      const houseId = document.getElementById("house-id-deal").value;
+      const customerId = document.getElementById("customer-id-deal").value;
+      const agentId = document.getElementById("agent-id-deal").value;
+      const propertyOwnerId = document.getElementById("property-owner-id-deal").value;
+      const status = document.getElementById("status").value;
+      const dealDate = document.getElementById("deal-date").value;
+      const price = document.getElementById("price-deal").value;
+      const data = {
+        house_id: houseId,
+        customer_id: customerId,
+        agent_id: agentId,
+        property_owner_id: propertyOwnerId,
+        status: status,
+        deal_date: dealDate,
+        price: price
+      };
+      console.log(data);
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/createDeal", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+
+        })
+        const message = await response.text(); // Added this line to get the response message
+        if (response.ok) {
+          alert(`${message}`);
+        } else {
+          alert(`Error: Failed to create new deal: ${message}`);
+        }
+      }
+      catch (error) {
+        alert(`Error: when creating new deal. Network error occurred: ${error.message}`);
+      }
+    }
+
+    // get all houses an agnet manages
+    async function getAgentHouses() {
+
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/houseagentmanage", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const responseBody = await response.json();
+        //show houses in the console
+        const houses = responseBody.houses;
+        console.log(responseBody);
+        console.log(houses);
+        const houseManaged = document.getElementById("house-managed");
+        houseManaged.innerHTML = "";
+        houses.forEach(house => {
+          const houseDiv = document.createElement("div");
+          houseDiv.innerHTML = `
+          
+            <h3>${house.location} ${house.layout}</h3>
+            <p>${house.description}</p>
+            <p>Price: ${house.total_price}</p>
+            <p>Location: ${house.location}</p>
+            <p>Area: ${house.size}</p>
+            <p>Number of Rooms: ${house.layout[0]}</p>
+            <p>Available: ${house.house_status}</p>
+            <p>Decoration: ${house.decoration}</p>
+          `;
+          houseManaged.appendChild(houseDiv);
+        });
+        return houses;
+      } catch (error) {
+        alert(`Error: Network error occurred: ${error.message}`);
+      }
+    }
+
+    // get all houses of property owner
+async function getPropertyOwnerHouses() {
+
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/propertyOwnerHouses", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const responseBody = await response.json();
+        //show houses in the console
+        const houses = responseBody.houses;
+        console.log(responseBody);
+        console.log(houses);
+        const houseManaged = document.getElementById("my-house");
+        houseManaged.innerHTML = "";
+        houses.forEach(house => {
+          const houseDiv = document.createElement("div");
+          houseDiv.innerHTML = `
+          
+            <h3>${house.location} ${house.layout}</h3>
+            <p>${house.description}</p>
+            <p>Price: ${house.total_price}</p>
+            <p>Location: ${house.location}</p>
+            <p>Area: ${house.size}</p>
+            <p>Number of Rooms: ${house.layout[0]}</p>
+            <p>Available: ${house.house_status}</p>
+            <p>Decoration: ${house.decoration}</p>
+          `;
+          houseManaged.appendChild(houseDiv);
+        });
+        return houses;
+      } catch (error) {
+        alert(`Error: Network error occurred: ${error.message}`);
+      }
+    }
+
+
+    // get all deals of an agnet
+async function getAgentDeals() {
+
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/agentDeals", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const responseBody = await response.json();
+        //show deals in the console
+        const deals = responseBody.deals;
+        console.log(responseBody);
+        console.log(deals);
+        const dealManaged = document.getElementById("deal");
+        dealManaged.innerHTML = "";
+        deals.forEach(deal => {
+          const dealDiv = document.createElement("div");
+          dealDiv.innerHTML = `
+
+            <p>Status: ${deal.status}</p>
+            <p>Deal Date: ${deal.deal_date}</p>
+            <p>House ID: ${deal.house_id}</p>
+            <p>Agent ID: ${deal.agent_id}</p>
+            <p>Customer ID: ${deal.customer_id}</p>
+            <p>Property Owner ID: ${deal.property_owner_id}</p>
+            <p>Price: ${deal.price}</p>
+          `;
+          dealManaged.appendChild(dealDiv);
+        });
+        return deals;
+      } catch (error) {
+        alert(`Error: Network error occurred: ${error.message}`);
+      }
+    }
+
+    // get all house viewings an agnet manages
+async function getAgentHouseViewings() {
+
+      try {
+        const response = await fetchWithToken("http://127.0.0.1:3007/property/houseViewAgentManage", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const responseBody = await response.json();
+        //show house viewings in the console
+        const houseViewings = responseBody.houseViewings;
+        console.log(responseBody);
+        console.log(houseViewings);
+        const houseViewingsManaged = document.getElementById("view-house");
+        houseViewingsManaged.innerHTML = "";
+        houseViewings.forEach(houseViewing => {
+          const houseViewingDiv = document.createElement("div");
+          houseViewingDiv.innerHTML = `
+          
+            <p>House ID: ${houseViewing.house_id}</p>
+            <p>Customer ID: ${houseViewing.customer_id}</p>
+            <p>Agent ID: ${houseViewing.agent_id}</p>
+            <p>Scheduled At: ${houseViewing.scheduled_at}</p>
+          `;
+          houseViewingsManaged.appendChild(houseViewingDiv);
+        });
+        return houseViewings;
+      } catch (error) {
+        alert(`Error: Network error occurred: ${error.message}`);
+      }
+    }
+
+// update house viewings
+async function updateHouseViewing() {
+  const houseViewID = document.getElementById("house-view-id").value;
+  // const houseId = document.getElementById("house-id-update").value;
+  // const customerId = document.getElementById("customer-id-update").value;
+  // const agentId = document.getElementById("agent-id-update").value;
+  const scheduledAt = document.getElementById("scheduled-at-view").value;
+  const data = {
+    house_view_id: houseViewID,
+    // house_id: houseId,
+    // customer_id: customerId,
+    // agent_id: agentId,
+    scheduled_at: scheduledAt
+  };
+  console.log(data);
+  try {
+    const response = await fetchWithToken("http://127.0.0.1:3007/property/updateHouseViewing", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+
+    })
+    const message = await response.text(); // Added this line to get the response message
+    if (response.ok) {
+      alert(`${message}`);
+    } else {
+      alert(`Error: Failed to update house viewing: ${message}`);
+    }
+  }
+  catch (error) {
+    alert(`Error: when updating house viewing. Network error occurred: ${error.message}`);
+  }
+}
+
+    // update deal
+async function updateDeal() {
+  const dealID = document.getElementById("deal-id").value;
+  const houseId = document.getElementById("house-id-deal").value;
+  const customerId = document.getElementById("customer-id-deal").value;
+  const agentId = document.getElementById("agent-id-deal").value;
+  const propertyOwnerId = document.getElementById("property-owner-id-deal").value;
+  const status = document.getElementById("status").value;
+  const dealDate = document.getElementById("deal-date").value;
+  const price = document.getElementById("price-deal").value;
+  const data = {
+    deal_id: dealID,
+    house_id: houseId,
+    customer_id: customerId,
+    agent_id: agentId,
+    property_owner_id: propertyOwnerId,
+    status: status,
+    deal_date: dealDate,
+    price: price
+  };
+  console.log(data);
+  try {
+    const response = await fetchWithToken("http://127.0.0.1:3007/property/updateDeal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+
+    })
+    const message = await response.text(); // Added this line to get the response message
+    if (response.ok) {
+      alert(`${message}`);
+    } else {
+      alert(`Error: Failed to update deal: ${message}`);
+    }
+  }
+  catch (error) {
+    alert(`Error: when updating deal. Network error occurred: ${error.message}`);
+  }
+}
+    
+
+    
+
+  </script>
+</head>
+
+<body>
+
+  <div id="user-name" style="position: relative; top: 0; left: 0;"></div>
+  <div id="houses-focused-admin" class="content-container-usertype">
+    <!-- Admin content for houses focused -->
+  </div>
+  <div id="houses-focused-user" class="content-container-usertype">
+    <!-- User content for houses focused -->
+  </div>
+  <div id="houses-focused-agent" class="content-container-usertype">
+    <!-- Agent content for houses focused -->
+    <!--     <p>Agent content for houses focused</p> -->
+    <ul>
+      <li><a href="#" onclick="showContent('house-managed')">House Managed</a></li>
+      <li><a href="#" onclick="showContent('view-house')">View House</a></li>
+      <li><a href="#" onclick="showContent('deal')">Deal</a></li>
+      <li><a href="#" onclick="showContent('new-house-view')">Edit House View</a></li>
+      <li><a href="#" onclick="showContent('new-deal')">Edit Deal</a></li>
+
+      <li><a href="#" onclick="showContent('profile')">Profile</a></li>
+    </ul>
+    <div id="Content-Section">
+
+      <div id="house-managed" class="content-container">
+        <h2>House Managed</h2>
+        <!-- Content for house managed -->
+      </div>
+      <div id="view-house" class="content-container">
+        <h2>View House</h2>
+        <!-- Content for view house -->
+
+      </div>
+      <div id="deal" class="content-container">
+        <h2>Deal</h2>
+        <!-- Content for deal -->
+      </div>
+      <div id="new-house-view" class="content-container">
+        <h2>New House View</h2>
+        <!-- Content for new house view -->
+        <!--    add a form to create new house view        -->
+        <form>
+        <label for="house-view-id">House View ID:</label>
+        <input type="text" id="house-view-id" name="house-view-id" value="修改时填写" /><br />
+
+          <label for="house-id">House ID:</label>
+          <input type="text" id="house-id-view" name="house-id" required /><br />
+          <label for="customer-id">Customer ID:</label>
+          <input type="text" id="customer-id-view" name="customer-id" required /><br />
+          <label for="agent-id">Agent ID:</label>
+          <input type="text" id="agent-id-view" name="agent-id" required /><br />
+          <label for="scheduled-at">Scheduled At:</label>
+          <input type="datetime-local" id="scheduled-at-view" name="scheduled-at" required /><br />
+          <button type="button" onclick="createHouseViewing()">Create New House View</button>
+            <button type="button" onclick="updateHouseViewing()">Update House View</button>
+        </form>
+
+      </div>
+      <div id="new-deal" class="content-container">
+        <h2>New Deal</h2>
+        <!-- Content for new deal -->
+        <!--    add a form to create a new deal        -->
+        <form>
+          <label for="deal-id">Deal ID:</label>
+          <input type="text" id="deal-id" name="deal-id" value="修改时填写" /><br />
+          <label for="house-id">House ID:</label>
+          <input type="text" id="house-id-deal" name="house-id" required /><br />
+          <label for="customer-id">Customer ID:</label>
+          <input type="text" id="customer-id-deal" name="customer-id" required /><br />
+          <label for="agent-id">Agent ID:</label>
+          <input type="text" id="agent-id-deal" name="agent-id" required /><br />
+          <label for="property-owner-id">Property Owner ID:</label>
+          <input type="text" id="property-owner-id-deal" name="property-owner-id" required /><br />
+          <label for="status">Status:</label>
+          <select id="status" name="status" required>
+            <option value="done">Done</option>
+            <option value="underway">Underway</option>
+            <option value="drop">Drop</option>
+          </select><br />
+          <label for="deal-date">Deal Date:</label>
+          <input type="date" id="deal-date" name="deal-date" required /><br />
+          <label for="price">Price:</label>
+          <input type="number" id="price-deal" name="price" step="10000" required /><br />
+          <button type="button" onclick="createDeal()">Create New Deal</button>
+            <button type="button" onclick="updateDeal()">Update Deal</button>
+        </form>
+
+      </div>
+      <div id="profile" class="content-container">
+        <!-- display user profile -->
+        <h3>User Profile</h3>
+        <p id="username">Username: ${userInfo.username}</p>
+        <p id="name">name: ${userInfo.name}</p>
+        <!-- <div>Email: ${userInfo.email}</div> -->
+        <p id="email">Email: ${userInfo.email}</p>
+        <p id="phone">Phone: ${userInfo.phone}</p>
+      </div>
+    </div>
+
+  </div>
+    
+  <div id="houses-focused-customer" class="content-container-usertype">
+    <!-- User content for houses focused -->
+    <table>
+      <tr>
+        <!-- Navigation Bar-->
+        <td id="Navigation-Bar">
+          <ul>
+            <li><a href="#" onclick="showContent('houses-focused')">Houses Focused</a></li>
+            <li><a href="#" onclick="showContent('community-focused')">Community Focused</a></li>
+            <li><a href="#" onclick="showContent('browsing-history')">Browsing History</a></li>
+            <li><a href="#" onclick="showContent('profile-customer')">Profile</a></li>
+            <li><a href="#" onclick="showContent('edit-profile')">Edit Profile</a></li>
+            <li><a href="#" onclick="showContent('my-house')">My House</a></li>
+
+
+          </ul>
+        </td>
+        <!-- Content Section -->
+        <td id="Content-Section">
+          <div id="houses-focused" class="content-container">
+            <h2>Houses Focused</h2>
+            <div id="second-hand-house">
+              <h3>Second-Hand House</h3>
+              <!-- Content for second-hand house -->
+            </div>
+            <div id="new-house">
+              <h3>New House</h3>
+              <!-- Content for new house -->
+            </div>
+            <div id="renting">
+              <h3>Renting</h3>
+              <!-- Content for renting -->
+            </div>
+          </div>
+          <div id="community-focused" class="content-container">
+            <h2>Community Focused</h2>
+            <!-- Content for community focused -->
+          </div>
+          <div id="browsing-history" class="content-container">
+            <h2>Browsing History</h2>
+            <!-- Content for browsing history -->
+          </div>
+          <div id='profile-customer' class="content-container">
+            
+            <h3>User Profile</h3>
+            <p id="username-customer">Username: ${userInfo.username}</p>
+            <p id="name-customer">name: ${userInfo.name}</p>
+            
+            <p id="email-customer">Email: ${userInfo.email}</p>
+            <p id="phone-customer">Phone: ${userInfo.phone}</p>
+
+          </div>
+          <div id="edit-profile" class="content-container">
+            <h2>Edit Profile</h2>
+            <!-- Content for editing user's profile -->
+            <div id="basic-information">
+              <h3>Basic Information</h3>
+              <form>
+                <!--        value="<%=userInfo.email%>" value=' `${userInfo.email}` ' value=`${userInfo.email}` -->
+                <label for="name">name:</label>
+                <input type="text" id="edit-name" name="name" required /><br />
+                <label for="email">Email:</label>
+                <input type="email" id="edit-email" name="email" required /><br />
+                <label for="phone">Phone:</label>
+                <input type="tel" id="edit-phone" name="phone" required /><br />
+                <button type="button" onclick="editProfile()">Save Changes</button>
+              </form>
+            </div>
+            <div id="change-password">
+              <h3>Change Password</h3>
+              <form>
+                <label for="old-password">Old Password:</label>
+                <input type="password" id="old-password" name="old-password" required /><br />
+                <label for="new-password">New Password:</label>
+                <input type="password" id="new-password" name="new-password" required /><br />
+                <label for="confirm-password">Confirm New Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required /><br />
+                <button type="button" onclick="changePassword()">Change Password</button>
+              </form>
+            </div>
+          </div>
+
+          <div id="my-house" class="content-container">
+            <h2>my house</h2>
+            <!-- Content for community focused -->
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+</body>
+
+</html>
